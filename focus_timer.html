@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مؤقت التركيز</title>
+    <style>
+        /* 1. الثيم الأساسي (Dark Blue / Neon Blue) */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0d1e2e 0%, #173f5f 100%); 
+            color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .header {
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+        }
+
+        .header h1 { margin: 0; font-size: 1.8em; color: #00e0ff; }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-decoration: none;
+            font-size: 1.2em;
+            color: #00e0ff;
+        }
+
+        .timer-container {
+            max-width: 500px;
+            width: 90%;
+            padding: 30px;
+            border-radius: 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            margin-top: 100px; 
+        }
+        
+        #current-task {
+            font-size: 1.2em;
+            color: #00e0ff;
+            margin-bottom: 20px;
+        }
+
+        #timer-display {
+            font-size: 5em;
+            font-weight: bold;
+            color: white;
+            margin: 20px 0;
+            text-shadow: 0 0 10px #00e0ff;
+        }
+
+        .controls button {
+            background-color: #00bcd4;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .controls button:hover {
+            background-color: #0097a7;
+        }
+
+        /* تنسيق قسم الصوت */
+        .sound-controls {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sound-controls label {
+            display: block;
+            margin-bottom: 10px;
+            color: #ecf0f1;
+        }
+
+        .sound-controls select {
+            background-color: #0d1e2e;
+            color: #00e0ff;
+            border: 1px solid #00e0ff;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 1em;
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 10px;
+            text-align: right; 
+            direction: rtl; 
+        }
+
+        .sound-controls input[type="range"] {
+            width: 100%;
+            max-width: 300px;
+            -webkit-appearance: none;
+            height: 5px;
+            background: #00e0ff;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+        #toggle-sound-btn {
+            background-color: #4caf50;
+            margin-bottom: 15px;
+        }
+        
+        .timer-finished {
+            color: #f44336; /* لون أحمر للتنبيه */
+            text-shadow: 0 0 10px #f44336;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="todo.html" class="back-button">العودة للمهام</a>
+        <h1>مؤقت التركيز النشط</h1>
+    </div>
+
+    <div class="timer-container">
+        
+        <p id="current-task">المهمة الحالية: جار التحميل...</p>
+        
+        <div id="timer-display">25:00</div>
+
+        <div class="controls">
+            <button id="start-pause-btn" onclick="startPauseTimer()">ابدأ</button> 
+            <button onclick="resetTimer()">إيقاف وإعادة</button> 
+        </div>
+        
+        <div class="sound-controls">
+            <h2>🎧 أصوات التركيز المحيطة</h2>
+            <label for="ambient-sound-select">اختر صوتاً للمساعدة على التركيز:</label>
+            <select id="ambient-sound-select">
+                <option value="">لا يوجد صوت (إيقاف)</option>
+                <option value="rain.wav">صوت المطر الهادئ</option>
+                <option value="waves.wav">صوت الموجات الهادئة</option>
+            </select>
+            
+            <button id="toggle-sound-btn" onclick="toggleAmbientSound()">تشغيل الصوت</button> 
+            
+            <label for="volume-control">مستوى الصوت:</label>
+            <input type="range" id="volume-control" min="0" max="1" step="0.1" value="0.5">
+            
+        </div>
+    </div>
+
+    <script>
+        const timerDisplay = document.getElementById('timer-display');
+        const startPauseBtn = document.getElementById('start-pause-btn');
+        const ambientSoundSelect = document.getElementById('ambient-sound-select');
+        const volumeControl = document.getElementById('volume-control');
+        const toggleSoundBtn = document.getElementById('toggle-sound-btn'); 
+        
+        let intervalId;
+        let isRunning = false;
+        let ambientAudio = new Audio(); 
+        let isAmbientPlaying = false; 
+        
+        const ALARM_SOUND_URL = "alarm.wav"; 
+
+        // 🆕 الدالة الجديدة: قراءة المدة من رابط الصفحة (URL Parameter)
+        function getDurationFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            // نحصل على القيمة المسماة 'duration'
+            const durationMinutes = parseInt(params.get('duration'));
+            
+            // نتحقق من أن القيمة رقم صحيح وموجب
+            if (!isNaN(durationMinutes) && durationMinutes > 0) {
+                // نضرب في 60 للتحويل من دقيقة إلى ثانية
+                return durationMinutes * 60;
+            }
+            // القيمة الافتراضية: 25 دقيقة (1500 ثانية)
+            return 1500; 
+        }
+
+        // 🆕 استخدام الدالة لتعيين المدة الأولية
+        let initialSeconds = getDurationFromURL();
+        let totalSeconds = initialSeconds; 
+
+        // 1. وظيفة تحديث عرض المؤقت
+        function updateDisplay() {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            timerDisplay.textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // 2. وظيفة تشغيل الصوت المحيط 
+        function playAmbientSound() {
+            const selectedSound = ambientSoundSelect.value;
+            if (!selectedSound) return;
+            
+            if (ambientAudio.src.indexOf(selectedSound) === -1) {
+                ambientAudio.src = selectedSound;
+            }
+            
+            ambientAudio.loop = true; 
+            ambientAudio.volume = volumeControl.value;
+
+            ambientAudio.play().then(() => {
+                isAmbientPlaying = true;
+                toggleSoundBtn.textContent = 'إيقاف الصوت';
+                toggleSoundBtn.style.backgroundColor = '#f44336'; 
+            }).catch(e => {
+                console.log("Ambient audio blocked. User interaction required.");
+            });
+        }
+
+        // 3. وظيفة إيقاف تشغيل الصوت المحيط 
+        function stopAmbientSound() {
+            if (ambientAudio) {
+                ambientAudio.pause();
+                ambientAudio.currentTime = 0; 
+                isAmbientPlaying = false;
+                toggleSoundBtn.textContent = 'تشغيل الصوت';
+                toggleSoundBtn.style.backgroundColor = '#4caf50'; 
+            }
+        }
+        
+        // 4. وظيفة تبديل الصوت اليدوية (مربوطة بالزر)
+        function toggleAmbientSound() {
+            if (ambientSoundSelect.value === "") {
+                stopAmbientSound();
+                alert("يرجى اختيار صوت أولاً لتشغيله.");
+                return;
+            }
+            
+            if (isAmbientPlaying) {
+                stopAmbientSound();
+            } else {
+                playAmbientSound();
+            }
+        }
+        
+        // 5. وظيفة بدء/إيقاف مؤقت المؤقت
+        function startPauseTimer() {
+            if (!isRunning) {
+                // START
+                isRunning = true;
+                startPauseBtn.textContent = 'إيقاف مؤقت';
+                startPauseBtn.style.backgroundColor = '#ff9800'; 
+                timerDisplay.classList.remove('timer-finished');
+                
+                intervalId = setInterval(() => {
+                    totalSeconds--;
+                    updateDisplay();
+                    
+                    if (totalSeconds <= 0) {
+                        clearInterval(intervalId);
+                        isRunning = false;
+                        startPauseBtn.textContent = 'انتهى! انقر لإعادة الضبط';
+                        startPauseBtn.style.backgroundColor = '#f44336'; 
+                        timerDisplay.classList.add('timer-finished');
+                        
+                        // 🔔 تشغيل التنبيه
+                        const alarmAudio = new Audio(ALARM_SOUND_URL); 
+                        alarmAudio.play().catch(e => console.log("Alarm audio blocked."));
+                        
+                        // إيقاف الصوت المحيط (إذا كان يعمل)
+                        stopAmbientSound();
+                    }
+                }, 1000);
+            } else {
+                // PAUSE
+                clearInterval(intervalId);
+                isRunning = false;
+                startPauseBtn.textContent = 'استئناف';
+                startPauseBtn.style.backgroundColor = '#00bcd4'; 
+            }
+        }
+
+        // 6. وظيفة إيقاف وإعادة ضبط المؤقت
+        function resetTimer() {
+            clearInterval(intervalId);
+            isRunning = false;
+            startPauseBtn.textContent = 'ابدأ';
+            startPauseBtn.style.backgroundColor = '#00bcd4';
+            timerDisplay.classList.remove('timer-finished');
+
+            // إعادة تعيين المؤقت إلى المدة التي تم تحميلها من الرابط
+            totalSeconds = initialSeconds; 
+            updateDisplay();
+            stopAmbientSound(); 
+            
+            document.getElementById('current-task').textContent = 'المهمة الحالية: يرجى العودة لمنظم المهام.';
+        }
+        
+        // 7. وظيفة التحميل عند بدء الصفحة
+        function loadSession() {
+            updateDisplay();
+            
+            volumeControl.addEventListener('input', () => {
+                if (ambientAudio) {
+                    ambientAudio.volume = volumeControl.value;
+                }
+            });
+
+            ambientSoundSelect.addEventListener('change', () => {
+                if (isAmbientPlaying) {
+                     stopAmbientSound();
+                     setTimeout(playAmbientSound, 100); 
+                } else if (ambientSoundSelect.value !== "") {
+                    toggleSoundBtn.textContent = 'تشغيل الصوت';
+                    toggleSoundBtn.style.backgroundColor = '#4caf50'; 
+                }
+            });
+        }
+        
+        loadSession();
+
+    </script>
+</body>
+</html>
