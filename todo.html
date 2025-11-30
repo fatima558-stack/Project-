@@ -3,21 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منظم المهام (Todo List)</title>
+    <title>مهامي وقائمة التركيز</title>
     <style>
-        /* 1. الثيم الأساسي (Dark Blue / Neon Blue) - نفس تصميم المؤقت */
+        /* 22 & 25. نظام ألوان هادئ وخلفية مريحة */
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Tahoma', sans-serif;
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            background: linear-gradient(135deg, #0d1e2e 0%, #173f5f 100%); 
-            color: #ecf0f1;
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            color: #f3f4f6;
             display: flex;
             flex-direction: column;
             align-items: center;
-            text-align: center;
+            padding-top: 100px;
+            padding-bottom: 50px;
+            animation: fadeIn 1s ease-out forwards;
         }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .header {
             color: white;
@@ -29,246 +32,368 @@
             top: 0;
             left: 0;
             right: 0;
-            width: 100%;
-            z-index: 10;
+            z-index: 1000;
+        }
+        .header h1 { margin: 0; font-size: 1.8em; color: #6ee7b7; }
+        
+        /* 9, 10, 11, 12, 13 - تنسيقات الـ To-Do List */
+        
+        .main-controls {
+             max-width: 600px;
+             width: 90%;
+             margin-bottom: 25px;
+             display: flex;
+             justify-content: space-between;
         }
 
-        .header h1 { margin: 0; font-size: 1.8em; color: #00e0ff; }
+        .nav-button {
+            background-color: #34d399;
+            color: #1f2937;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px; /* 23. حواف ناعمة */
+            font-size: 1em;
+            cursor: pointer;
+            margin: 0 5px;
+            transition: background-color 0.3s, transform 0.2s;
+            text-decoration: none;
+            font-weight: bold;
+        }
 
-        .container {
+        .nav-button:hover {
+            background-color: #6ee7b7;
+            transform: translateY(-2px);
+        }
+
+        .todo-container {
             max-width: 600px;
             width: 90%;
             padding: 30px;
             border-radius: 15px;
-            background-color: rgba(255, 255, 255, 0.05);
+            background-color: rgba(255, 255, 255, 0.08);
             box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
-            margin-top: 100px; /* لإفساح المجال للـ Header الثابت */
-            margin-bottom: 20px;
-            text-align: right;
-        }
-        
-        /* تنسيق الإدخالات (إضافة مهمة) */
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
         }
 
-        #task-input, #duration-input {
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #00e0ff;
-            background-color: #0d1e2e;
-            color: #ecf0f1;
+        /* 12. عدّاد المهام */
+        #task-counter {
+            text-align: right;
+            margin-bottom: 20px;
             font-size: 1em;
-            flex-grow: 1;
+            color: #9ca3af;
         }
-        
-        #duration-input {
-            flex-grow: 0;
-            width: 80px;
+        #task-counter span {
+            color: #6ee7b7;
+            font-weight: bold;
+        }
+
+        .input-group {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        #new-task {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px 0 0 8px;
+            font-size: 1em;
+            background-color: #374151;
+            color: #f3f4f6;
         }
 
         #add-task-btn {
-            background-color: #00bcd4;
-            color: white;
+            background-color: #34d399;
+            color: #1f2937;
             border: none;
             padding: 10px 15px;
-            border-radius: 8px;
-            font-size: 1em;
+            border-radius: 0 8px 8px 0;
             cursor: pointer;
+            font-weight: bold;
             transition: background-color 0.3s;
         }
 
         #add-task-btn:hover {
-            background-color: #0097a7;
+            background-color: #6ee7b7;
         }
 
-        /* تنسيق قائمة المهام */
         #task-list {
             list-style: none;
             padding: 0;
         }
 
+        /* 13. تنظيم شكل البطاقات */
         .task-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
+            padding: 12px 15px;
             margin-bottom: 10px;
-            background-color: rgba(255, 255, 255, 0.1);
             border-radius: 8px;
-            border-right: 5px solid #00e0ff;
-            transition: background-color 0.3s;
-        }
-        
-        .task-item:hover {
-            background-color: rgba(255, 255, 255, 0.15);
+            background-color: #1f2937;
+            transition: background-color 0.3s, opacity 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
         }
 
-        .task-details {
+        .task-item.completed {
+            /* 11. تغير لون المهام المنجزة */
+            background-color: #374151;
+            opacity: 0.7;
+        }
+
+        .task-text {
             flex-grow: 1;
+            font-size: 1.1em;
+            cursor: pointer;
             text-align: right;
-        }
-        
-        .task-details h3 {
-            margin: 0 0 5px 0;
-            color: #00e0ff;
-            font-size: 1.2em;
+            margin-left: 10px;
+            color: #f3f4f6;
+            transition: text-decoration 0.3s, color 0.3s;
         }
 
-        .task-details p {
-            margin: 0;
-            color: #ecf0f1;
+        .task-item.completed .task-text {
+            /* 11. خط الشطب */
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+
+        .task-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-left: 8px;
+            font-size: 1.1em;
+            transition: color 0.2s;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        /* 9. زر حذف المهمة */
+        .task-actions .delete-btn {
+            color: #f87171; /* أحمر */
+        }
+        .task-actions .delete-btn:hover {
+            color: #ef4444;
+        }
+
+        /* 10. زر تعديل المهمة */
+        .task-actions .edit-btn {
+            color: #fcd34d; /* أصفر */
+        }
+        .task-actions .edit-btn:hover {
+            color: #fbbf24;
+        }
+
+        /* 13. زر البدء بالمؤقت */
+        .task-actions .focus-btn {
+            background-color: #60a5fa; /* أزرق */
+            color: #1f2937;
+            padding: 5px 10px;
             font-size: 0.9em;
+            font-weight: bold;
+            border-radius: 5px;
         }
-
-        /* تنسيق الأزرار داخل المهمة */
-        .task-actions {
-            display: flex;
-            gap: 8px;
+        .task-actions .focus-btn:hover {
+            background-color: #3b82f6;
         }
         
-        /* زر البدء */
-        .start-btn {
-            background-color: #4caf50; /* أخضر */
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            text-decoration: none;
-            cursor: pointer;
-            transition: background-color 0.3s;
+        /* 29. صفحة About (سيتم ربطها بملف About.html) */
+        .about-link {
+             position: absolute;
+             bottom: 20px;
+             left: 20px;
+             color: #9ca3af;
+             text-decoration: none;
+             font-size: 0.9em;
+             transition: color 0.3s;
+        }
+        .about-link:hover {
+             color: #6ee7b7;
         }
 
-        .start-btn:hover {
-            background-color: #388e3c;
-        }
-
-        /* زر الحذف */
-        .delete-btn {
-            background-color: #f44336; /* أحمر */
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .delete-btn:hover {
-            background-color: #d32f2f;
-        }
-        
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>📑 قائمة المهام اليومية (Todo)</h1>
+        <h1>إدارة مهامي اليومية</h1>
+    </div>
+    
+    <div class="main-controls">
+        <a href="index.html" class="nav-button">العودة للواجهة</a>
+        <a href="focus_timer.html" class="nav-button">مؤقت التركيز</a>
+        <a href="quiz.html" class="nav-button">اختبار المراجعة</a>
     </div>
 
-    <div class="container">
-        <h2>إضافة مهمة جديدة</h2>
+    <div class="todo-container">
+        
+        <div id="task-counter">
+            إجمالي المهام: <span id="total-count">0</span> | المنجز: <span id="completed-count">0</span>
+        </div>
+
         <div class="input-group">
-            <input type="text" id="task-input" placeholder="اسم المهمة (مثلاً: دراسة التاريخ)">
-            <input type="number" id="duration-input" placeholder="المدة (بالدقائق)" min="1" value="25">
+            <input type="text" id="new-task" placeholder="أدخل مهمة جديدة..." autofocus>
             <button id="add-task-btn">إضافة</button>
         </div>
         
-        <hr style="border-color: rgba(255, 255, 255, 0.1);">
-        
-        <h2>المهام الحالية</h2>
         <ul id="task-list">
             </ul>
     </div>
+    
+    <a href="about.html" class="about-link">حول المشروع</a>
 
     <script>
-        const taskInput = document.getElementById('task-input');
-        const durationInput = document.getElementById('duration-input');
-        const addTaskBtn = document.getElementById('add-task-btn');
         const taskList = document.getElementById('task-list');
+        const newTaskInput = document.getElementById('new-task');
+        const addTaskBtn = document.getElementById('add-task-btn');
+        const totalCountEl = document.getElementById('total-count');
+        const completedCountEl = document.getElementById('completed-count');
 
-        // مفتاح تخزين المهام في متصفح المستخدم
-        const STORAGE_KEY = 'pomodoroTasks';
+        let tasks = JSON.parse(localStorage.getItem('tasks_data')) || [];
 
-        // 🔑 1. دالة تحميل المهام من الذاكرة المحلية (Local Storage)
-        function loadTasks() {
-            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-            taskList.innerHTML = ''; // تفريغ القائمة قبل إعادة بنائها
-            tasks.forEach(task => displayTask(task));
+        // 12. وظيفة تحديث العداد
+        function updateCounter() {
+            const total = tasks.length;
+            const completed = tasks.filter(task => task.completed).length;
+            totalCountEl.textContent = total;
+            completedCountEl.textContent = completed;
         }
 
-        // 🔑 2. دالة عرض المهمة في الواجهة
-        function displayTask(task) {
+        // حفظ البيانات في Local Storage
+        function saveTasks() {
+            localStorage.setItem('tasks_data', JSON.stringify(tasks));
+            updateCounter();
+        }
+
+        // 13. وظيفة إنشاء عنصر المهمة
+        function createTaskElement(task) {
             const listItem = document.createElement('li');
-            listItem.className = 'task-item';
-            
-            // رابط بدء المؤقت (هنا يتم تمرير المدة!)
-            const startLink = `focus_timer.html?duration=${task.duration}&task=${encodeURIComponent(task.name)}`;
-
-            listItem.innerHTML = `
-                <div class="task-details">
-                    <h3>${task.name}</h3>
-                    <p>المدة المطلوبة: ${task.duration} دقيقة</p>
-                </div>
-                <div class="task-actions">
-                    <a href="${startLink}" class="start-btn">بدء التركيز</a>
-                    <button class="delete-btn" data-task-name="${task.name}">حذف</button>
-                </div>
-            `;
-            
-            // ربط زر الحذف بالدالة
-            listItem.querySelector('.delete-btn').addEventListener('click', deleteTask);
-            
-            taskList.appendChild(listItem);
-        }
-
-        // 🔑 3. دالة إضافة مهمة جديدة
-        function addTask() {
-            const taskName = taskInput.value.trim();
-            const duration = parseInt(durationInput.value);
-
-            if (taskName === '' || isNaN(duration) || duration <= 0) {
-                alert('يرجى إدخال اسم صحيح للمهمة ومدة بالدقائق أكبر من صفر.');
-                return;
+            listItem.classList.add('task-item');
+            if (task.completed) {
+                listItem.classList.add('completed');
             }
+            listItem.dataset.id = task.id;
+
+            const textSpan = document.createElement('span');
+            textSpan.classList.add('task-text');
+            textSpan.textContent = task.text;
+            textSpan.onclick = () => toggleCompleted(task.id);
+
+            const actionsDiv = document.createElement('div');
+            actionsDiv.classList.add('task-actions');
             
-            const newTask = { name: taskName, duration: duration };
+            // 10. زر تعديل المهمة
+            const editBtn = document.createElement('button');
+            editBtn.classList.add('edit-btn');
+            editBtn.innerHTML = '✏️';
+            editBtn.onclick = (e) => {
+                e.stopPropagation(); 
+                editTask(task.id);
+            };
+
+            // 9. زر حذف المهمة
+            const deleteBtn = document.createElement('button');
+            deleteBtn.classList.add('delete-btn');
+            deleteBtn.innerHTML = '🗑️';
+            deleteBtn.onclick = (e) => {
+                e.stopPropagation(); 
+                deleteTask(task.id);
+            };
             
-            // حفظ المهمة في الذاكرة المحلية
-            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            // زر بدء المؤقت
+            const focusBtn = document.createElement('button');
+            focusBtn.classList.add('focus-btn');
+            focusBtn.textContent = 'ابدأ التركيز';
+            focusBtn.onclick = (e) => {
+                e.stopPropagation(); 
+                startFocusSession(task);
+            };
+
+            actionsDiv.appendChild(focusBtn);
+            actionsDiv.appendChild(editBtn);
+            actionsDiv.appendChild(deleteBtn);
+            
+            listItem.appendChild(textSpan);
+            listItem.appendChild(actionsDiv);
+
+            return listItem;
+        }
+
+        // عرض قائمة المهام
+        function renderTasks() {
+            taskList.innerHTML = '';
+            tasks.forEach(task => {
+                taskList.appendChild(createTaskElement(task));
+            });
+            updateCounter();
+        }
+
+        // إضافة مهمة جديدة
+        function addTask() {
+            const text = newTaskInput.value.trim();
+            if (text === '') return;
+
+            const newTask = {
+                id: Date.now().toString(),
+                text: text,
+                completed: false
+            };
+
             tasks.push(newTask);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-
-            // تحديث الواجهة
-            displayTask(newTask);
-
-            // تفريغ حقول الإدخال
-            taskInput.value = '';
-            durationInput.value = '25'; 
+            newTaskInput.value = '';
+            saveTasks();
+            renderTasks();
         }
 
-        // 🔑 4. دالة حذف مهمة
-        function deleteTask(event) {
-            const taskName = event.target.getAttribute('data-task-name');
-            
-            // حذف المهمة من الذاكرة المحلية
-            let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-            tasks = tasks.filter(task => task.name !== taskName);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-            
-            // إعادة تحميل الواجهة لتحديث القائمة
-            loadTasks();
+        // وضع علامة إنجاز/إلغاء
+        function toggleCompleted(id) {
+            const taskIndex = tasks.findIndex(t => t.id === id);
+            if (taskIndex !== -1) {
+                tasks[taskIndex].completed = !tasks[taskIndex].completed;
+                saveTasks();
+                renderTasks(); 
+            }
         }
 
-        // ربط زر الإضافة بالدالة
-        addTaskBtn.addEventListener('click', addTask);
+        // 9. حذف مهمة
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            saveTasks();
+            renderTasks();
+        }
         
-        // تحميل المهام عند فتح الصفحة
-        window.onload = loadTasks;
+        // 10. تعديل مهمة
+        function editTask(id) {
+            const taskIndex = tasks.findIndex(t => t.id === id);
+            if (taskIndex !== -1) {
+                const newText = prompt("تعديل المهمة:", tasks[taskIndex].text);
+                if (newText !== null && newText.trim() !== "") {
+                    tasks[taskIndex].text = newText.trim();
+                    saveTasks();
+                    renderTasks();
+                }
+            }
+        }
+        
+        // بدء جلسة تركيز
+        function startFocusSession(task) {
+             // نحفظ المهمة التي تم اختيارها في الـ Local Storage
+             localStorage.setItem('focus_session_task', JSON.stringify({
+                 id: task.id,
+                 text: task.text,
+                 // يمكن إضافة وقت البدء هنا لاحقاً
+             }));
+             // الانتقال إلى صفحة المؤقت
+             window.location.href = 'focus_timer.html';
+        }
 
+        addTaskBtn.addEventListener('click', addTask);
+        newTaskInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+
+        renderTasks();
     </script>
 </body>
 </html>

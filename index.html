@@ -3,273 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Study App</title>
+    <title>مساعد الدراسة الذكي</title>
     <style>
-        /* CSS الخاص بـ index.html - تم تعديله ليكون شاشة البداية */
+        /* 22 & 25. نظام ألوان هادئ وخلفية مريحة */
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Tahoma', sans-serif; 
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%); 
+            color: #f3f4f6;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
-            overflow: hidden; 
-        }
-        
-        /* ------------------------------------------- */
-        /* 1. تصميم الواجهة الرئيسية (القائمة) */
-        /* ------------------------------------------- */
-        .container {
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
-            max-width: 90%;
-            width: 400px;
-            opacity: 0;
-            transition: opacity 1s ease-in;
-            z-index: 20;
-        }
-
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            border-bottom: 3px solid #ff9800;
-            padding-bottom: 10px;
-        }
-
-        h2 {
-            font-size: 1.2em;
-            color: #ccc;
-            margin-bottom: 40px;
-        }
-
-        .main-menu {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .menu-option {
-            background-color: #00bcd4;
-            color: white;
-            text-decoration: none;
-            padding: 15px 25px;
-            border-radius: 10px;
-            font-size: 1.1em;
-            font-weight: bold;
-            transition: background-color 0.3s, transform 0.2s;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .menu-option:hover {
-            background-color: #ff9800;
-            transform: translateY(-3px);
-        }
-
-        /* ------------------------------------------- */
-        /* 2. تصميم الساعة الرملية (من splash.html) */
-        /* ------------------------------------------- */
-        .splash-area {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            transition: opacity 0.5s ease-out;
-        }
-
-        .hourglass-container {
-            width: 80px;
-            height: 140px;
-            position: relative;
-            margin-bottom: 25px;
-            transform-origin: 50% 50%;
-            animation: flip-initial 1.5s ease-out forwards;
-            animation-delay: 0.5s;
-            opacity: 0;
-            z-index: 10;
-        }
-
-        .hourglass-container::before {
-            content: '';
-            position: absolute;
-            top: 15px;
-            bottom: 15px;
-            left: 15px;
-            right: 15px;
-            border: 3px solid #b3e5fc;
-            border-radius: 100% / 30%;
-            z-index: 1;
-            box-shadow: 0 0 10px rgba(0, 150, 136, 0.2); 
-        }
-
-        .hourglass-container::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            width: 100%;
-            height: 15px;
-            background: #8d6e63;
-            border-radius: 5px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            top: 0;
-        }
-        
-        .hourglass-container > div:last-of-type::after { 
-            content: ''; 
-            position: absolute; 
-            bottom: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 15px; 
-            background: #8d6e63; 
-            border-radius: 5px; 
-            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1); 
-        }
-
-        .sand {
-            position: absolute;
-            top: 15px;
-            left: 10px;
-            width: 60px;
-            height: 110px;
             overflow: hidden;
-            z-index: 5;
-        }
-
-        .sand-top {
-            position: absolute;
-            top: 0;
-            width: 100%;
-            height: 50%;
-            background: #ff9800;
-            clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
-            animation: sand-flow 3s linear forwards; 
-        }
-        
-        .sand-stream {
-            position: absolute;
-            top: 50%;
-            left: 48%;
-            width: 4px;
-            height: 5px;
-            background-color: #ff9800;
-            border-radius: 50%;
-            animation: sand-drop 0.1s infinite step-end;
-        }
-
-        .sand-bottom {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 50%;
-            background: #ff9800;
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-            transform: scaleY(0);
-            transform-origin: bottom;
-            animation: sand-fill 3s linear forwards; 
-        }
-        
-        @keyframes flip-initial {
-            0% { transform: rotate(0deg); opacity: 0; }
-            50% { opacity: 1; }
-            100% { transform: rotate(180deg); opacity: 1; }
-        }
-
-        @keyframes sand-flow {
-            0% { transform: scaleY(1); }
-            100% { transform: scaleY(0); }
-        }
-
-        @keyframes sand-fill {
-            0% { transform: scaleY(0); }
-            100% { transform: scaleY(1); }
-        }
-        
-        @keyframes sand-drop {
-            0% { transform: translateY(0); opacity: 1; }
-            100% { transform: translateY(50px); opacity: 0; }
-        }
-
-        .loading-text {
-            font-size: 1.6em;
-            font-weight: bold;
             opacity: 0;
-            animation: fadeIn 1s forwards 1.8s;
-            color: #ff9800;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1.2s ease-out forwards;
         }
 
         @keyframes fadeIn {
-            100% { opacity: 1; }
+            to { opacity: 1; }
         }
+
+        .intro-container {
+            max-width: 700px;
+            padding: 50px 40px;
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* ⏳ الساعة الرملية المتحركة تنقلب مرة واحدة وتثبت */
+        .hourglass-wrapper {
+             font-size: 8em; 
+             color: #6ee7b7; 
+             margin-bottom: 15px;
+             animation: fadeIn 1s ease-out forwards;
+             display: inline-block;
+        }
+        
+        .hourglass {
+            display: inline-block;
+            /* شكل محسّن للساعة الرملية (إضافة ظل) */
+            text-shadow: 0 0 15px #6ee7b7, 0 0 5px #1f2937; 
+            /* الحركة لمرة واحدة فقط: تنقلب 180 درجة ثم تثبت */
+            animation: flipOnce 1.5s ease-out forwards; 
+            transform-origin: center center;
+            line-height: 1;
+        }
+
+        @keyframes flipOnce {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(180deg); } /* تثبت على 180 درجة */
+        }
+        
+        /* 1. اسم المشروع في سطر واحد وبخط مميز */
+        h1 {
+            font-family: 'Georgia', serif; 
+            font-size: 3em;
+            color: #6ee7b7; 
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+            opacity: 0; 
+            animation: text-focus-in 1s cubic-bezier(0.550, 0.085, 0.680, 0.530) 1.5s both; 
+        }
+
+        @keyframes text-focus-in {
+          0% { filter: blur(12px); opacity: 0; }
+          100% { filter: blur(0px); opacity: 1; }
+        }
+
+
+        /* 2. جملة تعريفية قصيرة */
+        p.description {
+            font-size: 1.1em;
+            color: #cbd5e1;
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0; 
+            animation: slideInFromTop 1s ease-out 2s both;
+        }
+        
+        @keyframes slideInFromTop {
+            0% { transform: translateY(-20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        /* 3. معلومات الطالب بخط ناعم وموزعة */
+        .student-info {
+            font-size: 1em;
+            color: #9ca3af;
+            margin-top: 20px;
+            margin-bottom: 40px;
+            line-height: 1.8;
+            opacity: 0; 
+            animation: fadeIn 1.5s ease-out 2.5s both;
+            text-align: right;
+            padding: 0 20px;
+        }
+        
+        .info-row {
+             display: flex;
+             justify-content: space-between;
+             margin-bottom: 8px;
+             font-weight: 300;
+        }
+        
+        .info-row span {
+            color: #6ee7b7;
+            font-weight: 500;
+        }
+
+        /* 4. زر ابدأ */
+        .start-button {
+            background-color: #6ee7b7;
+            color: #1f2937;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px; 
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(110, 231, 183, 0.4);
+            opacity: 0; 
+            animation: scaleIn 0.8s ease-out 3s both; 
+        }
+        
+        @keyframes scaleIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+
+        .start-button:hover {
+            background-color: #34d399;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(110, 231, 183, 0.6);
+        }
+
+        /* 33. اقتباس تحفيزي يتغير */
+        .quote {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #4b5563;
+            font-style: italic;
+            font-size: 0.85em;
+            max-width: 80%;
+            opacity: 0;
+            animation: fadeIn 1.5s ease-out 3.5s both;
+        }
+        
     </style>
 </head>
 <body>
 
-    <div id="splash-area" class="splash-area">
+    <div class="intro-container">
         
-        <div class="hourglass-container">
-             <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 15px; background: #8d6e63; border-radius: 5px; box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);"></div>
-            
-            <div class="sand">
-                <div class="sand-top"></div>
-                <div class="sand-stream"></div>
-                <div class="sand-bottom"></div>
+        <div class="hourglass-wrapper">
+             <span class="hourglass">⏳</span>
+        </div>
+        
+        <h1>مساعد الدراسة الذكي</h1>
+        
+        <p class="description">
+            تطبيقك المتكامل لإدارة الوقت، تتبع التركيز، والمراجعة الفعّالة للامتحانات.
+        </p>
+        
+        <div class="student-info">
+            <div class="info-row">
+                 <span>الاسم:</span> فاطمة عبد الامير
+            </div>
+            <div class="info-row">
+                 <span>الصف:</span> الخامس علمي
+            </div>
+            <div class="info-row">
+                 <span>المدرسة:</span> اعدادية زينب الكبرى
             </div>
         </div>
         
-        <p class="loading-text">وقت الإبداع: لنبدأ رحلة التفوق!</p>
+        <a href="main_menu.html" class="start-button">ابدأ التركيز</a>
+
     </div>
-
-    <div id="main-container" class="container">
-        <h1>المنظم الذكي</h1>
-        <h2>اختر الأداة التي تحتاجها الآن</h2>
-        
-        <div class="main-menu">
-            <a href="todo.html" class="menu-option">
-                To-Do List
-            </a>
-
-            <a href="quiz.html" class="menu-option">
-                Quiz App
-            </a>
-        </div>
-    </div>
-
-    <script>
-        const splashArea = document.getElementById('splash-area');
-        const mainContainer = document.getElementById('main-container');
-        
-        // الانتظار 4000 ملي ثانية (4 ثواني) لانتهاء الحركة
-        setTimeout(() => {
-            // 1. إخفاء شاشة البداية تدريجياً
-            splashArea.style.opacity = '0';
-            
-            // 2. إظهار الواجهة الرئيسية
-            mainContainer.style.opacity = '1';
-
-            // 3. إزالة شاشة البداية تماماً وجعلها غير قابلة للنقر
-            setTimeout(() => {
-                splashArea.style.display = 'none';
-                // 🔑 هذا السطر يحل مشكلة عدم عمل الأزرار (يمنع أي شيء من التغطية عليها)
-                splashArea.style.pointerEvents = 'none'; 
-            }, 500); 
-
-        }, 4000); 
-    </script>
+    
+    <p class="quote" id="motivational-quote">
+        "التعلّم لا يقتصر على ما يتم تدريسه، بل على ما يتم إنجازه."
+    </p>
 
 </body>
 </html>
